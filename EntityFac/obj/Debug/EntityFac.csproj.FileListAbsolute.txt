@@ -1,0 +1,9 @@
+d:\EntityFac\EntityFac\EntityFac\bin\Debug\EntityFac.exe.config
+d:\EntityFac\EntityFac\EntityFac\bin\Debug\EntityFac.exe
+d:\EntityFac\EntityFac\EntityFac\bin\Debug\EntityFac.pdb
+d:\EntityFac\EntityFac\EntityFac\obj\Debug\EntityFac.csprojResolveAssemblyReference.cache
+d:\EntityFac\EntityFac\EntityFac\obj\Debug\EntityFac.Form1.resources
+d:\EntityFac\EntityFac\EntityFac\obj\Debug\EntityFac.Properties.Resources.resources
+d:\EntityFac\EntityFac\EntityFac\obj\Debug\EntityFac.csproj.GenerateResource.Cache
+d:\EntityFac\EntityFac\EntityFac\obj\Debug\EntityFac.exe
+d:\EntityFac\EntityFac\EntityFac\obj\Debug\EntityFac.pdb
