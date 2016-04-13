@@ -66,24 +66,22 @@ namespace EntityFac
             {
                 DataRowView dv = ((DataRowView)cbxTables.CheckedItems[i]);
                 if (dv == null) continue;
-                string id = dv["name"].ToString();
-                var temp = ExecuteDataTable(this.txtConnection.Text, string.Format(queryColumns, id));
-                using (var temdp = File.Create(this.txtAddress.Text.Trim() + "\\" + id + ".cs"))
-                {
-                }
-                using (StreamWriter sw = new StreamWriter(this.txtAddress.Text.Trim() + "\\" + id + ".cs"))
+                string tableName = dv["name"].ToString();
+                var temp = ExecuteDataTable(this.txtConnection.Text, string.Format(queryColumns, tableName));
+                /*加测是否存在路径*/
+                using (StreamWriter sw = new StreamWriter(this.txtAddress.Text.Trim() + "\\" + tableName + ".cs"))
                 {
                     sw.WriteLine("using System;");
                     sw.WriteLine("namespace " + "空间");
                     sw.WriteLine("{");
-                    sw.WriteLine("\tpublic class " + id);
+                    sw.WriteLine("\tpublic class " + tableName);
                     sw.WriteLine("\t{");
                     foreach (DataRow dr in temp.Rows)
                     {
                         sw.WriteLine("\t\t/// <summary>");
                         sw.WriteLine("\t\t/// " + dr["Comment"].ToString());
                         sw.WriteLine("\t\t/// <summary>");
-                        sw.WriteLine("\t\tpublic " + dr["ColumnType"] + " " + dr["ColumnName"] + " { get; set; }");
+                        sw.WriteLine("\t\tpublic " + dr["ColumnType"] + " " + System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(dr["ColumnName"].ToString()) + " { get; set; }");
                     }
                     sw.WriteLine("\t}");
                     sw.WriteLine("}");
