@@ -66,12 +66,12 @@ namespace EntityFac
             {
                 DataRowView dv = ((DataRowView)cbxTables.CheckedItems[i]);
                 if (dv == null) continue;
-                string id = dv["TableName"].ToString();
+                string id = dv["name"].ToString();
                 var temp = ExecuteDataTable(this.txtConnection.Text, string.Format(queryColumns, id));
-                using (var temdp = File.Create("F:/Tmmp/" + id + ".cs"))
+                using (var temdp = File.Create(this.txtAddress.Text.Trim() + "\\" + id + ".cs"))
                 {
                 }
-                using (StreamWriter sw = new StreamWriter("F:/Tmmp/" + id + ".cs"))
+                using (StreamWriter sw = new StreamWriter(this.txtAddress.Text.Trim() + "\\" + id + ".cs"))
                 {
                     sw.WriteLine("using System;");
                     sw.WriteLine("namespace " + "空间");
@@ -84,7 +84,6 @@ namespace EntityFac
                         sw.WriteLine("\t\t/// " + dr["Comment"].ToString());
                         sw.WriteLine("\t\t/// <summary>");
                         sw.WriteLine("\t\tpublic " + dr["ColumnType"] + " " + dr["ColumnName"] + " { get; set; }");
-                        sw.WriteLine("");
                     }
                     sw.WriteLine("\t}");
                     sw.WriteLine("}");
@@ -132,6 +131,13 @@ namespace EntityFac
             {
                 cbxTables.SetItemCheckState(i, CheckState.Checked);
             }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog path = new FolderBrowserDialog();
+            path.ShowDialog();
+            this.txtAddress.Text = path.SelectedPath;
         }
     }
 }
