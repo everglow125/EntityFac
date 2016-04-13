@@ -9,58 +9,65 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Configuration;
 
 namespace EntityFac
 {
     public partial class Form1 : Form
     {
+
+        private static string queryDataBase = "select [name] from [sysdatabases] order by [name]";
+        private static string queryTables = "SELECT  name FROM  sysobjects WHERE   xtype = 'U' ORDER BY name; ";
+        private static string queryColumns =
+@"SELECT  
+            CONVERT(VARCHAR, T1.name) AS ColumnName ,--字段名
+            CONVERT(VARCHAR, T2.name) AS ColumnType ,--字段类型
+            T1.prec AS MaxLength ,--最大长度
+            CONVERT(VARCHAR, T5.COLUMN_DEFAULT) AS DefaultValue ,--默认值
+            CONVERT(VARCHAR, T4.value) AS Comment ,--描述
+            T1.isnullable AS NullAble--是否为空
+    FROM    syscolumns T1
+            LEFT JOIN systypes T2 ON T1.xusertype = T2.xusertype
+            INNER JOIN sysobjects T3 ON T1.id = T3.id
+                                        AND T3.xtype = 'U '
+                                        AND T3.name <> 'dtproperties '
+            LEFT JOIN sys.extended_properties T4 ON T1.id = T4.major_id
+                                                    AND T1.colid = T4.minor_id
+            JOIN INFORMATION_SCHEMA.COLUMNS T5 ON T1.name = T5.COLUMN_NAME
+                                                    AND T5.TABLE_NAME = '{0}'
+    WHERE   T3.name = '{0}';";
+
         public Form1()
         {
             InitializeComponent();
+            string connection = string.Format("Data Source={0};User Id={1};Password={2};"
+                , ConfigurationManager.AppSettings["serverAddress"]
+                , ConfigurationManager.AppSettings["account"]
+                , ConfigurationManager.AppSettings["pwd"]);
+
+            if (ConfigurationManager.AppSettings["database"] != "")
+                connection += string.Format("Initial Catalog={0};", ConfigurationManager.AppSettings["database"]);
+            this.txtConnection.Text = connection;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string sql = @"
-SELECT  name AS TableName 
-FROM    sysobjects
-WHERE   xtype = 'U'
-ORDER BY name;";
-            DataTable dt = ExecuteDataTable(this.txtConnection.Text, sql);
+            DataTable dt = ExecuteDataTable(this.txtConnection.Text, queryTables);
             this.cbxTables.DataSource = dt;
-            this.cbxTables.ValueMember = "TableName";
-            this.cbxTables.DisplayMember = "TableName";
+            this.cbxTables.ValueMember = "name";
+            this.cbxTables.DisplayMember = "name";
         }
 
 
 
         private void button2_Click(object sender, EventArgs e)
         {
-
-            string sql = @"
-        SELECT  
-                CONVERT(VARCHAR, T1.name) AS ColumnName ,--字段名
-                CONVERT(VARCHAR, T2.name) AS ColumnType ,--字段类型
-                T1.prec AS MaxLength ,--最大长度
-                CONVERT(VARCHAR, T5.COLUMN_DEFAULT) AS DefaultValue ,--默认值
-                CONVERT(VARCHAR, T4.value) AS Comment ,--描述
-                T1.isnullable AS NullAble--是否为空
-        FROM    syscolumns T1
-                LEFT JOIN systypes T2 ON T1.xusertype = T2.xusertype
-                INNER JOIN sysobjects T3 ON T1.id = T3.id
-                                            AND T3.xtype = 'U '
-                                            AND T3.name <> 'dtproperties '
-                LEFT JOIN sys.extended_properties T4 ON T1.id = T4.major_id
-                                                        AND T1.colid = T4.minor_id
-                JOIN INFORMATION_SCHEMA.COLUMNS T5 ON T1.name = T5.COLUMN_NAME
-                                                      AND T5.TABLE_NAME = '{0}'
-        WHERE   T3.name = '{0}';";
             for (int i = 0; i < cbxTables.CheckedItems.Count; i++)
             {
                 DataRowView dv = ((DataRowView)cbxTables.CheckedItems[i]);
                 if (dv == null) continue;
                 string id = dv["TableName"].ToString();
-                var temp = ExecuteDataTable(this.txtConnection.Text, string.Format(sql, id));
+                var temp = ExecuteDataTable(this.txtConnection.Text, string.Format(queryColumns, id));
                 using (var temdp = File.Create("F:/Tmmp/" + id + ".cs"))
                 {
                 }

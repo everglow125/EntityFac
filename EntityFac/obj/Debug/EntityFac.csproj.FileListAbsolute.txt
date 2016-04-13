@@ -7,3 +7,12 @@ d:\EntityFac\EntityFac\EntityFac\obj\Debug\EntityFac.Properties.Resources.resour
 d:\EntityFac\EntityFac\EntityFac\obj\Debug\EntityFac.csproj.GenerateResource.Cache
 d:\EntityFac\EntityFac\EntityFac\obj\Debug\EntityFac.exe
 d:\EntityFac\EntityFac\EntityFac\obj\Debug\EntityFac.pdb
+F:\Tmmp\EntityFac\EntityFac\bin\Debug\EntityFac.exe.config
+F:\Tmmp\EntityFac\EntityFac\obj\Debug\EntityFac.exe
+F:\Tmmp\EntityFac\EntityFac\obj\Debug\EntityFac.pdb
+F:\Tmmp\EntityFac\EntityFac\bin\Debug\EntityFac.exe
+F:\Tmmp\EntityFac\EntityFac\bin\Debug\EntityFac.pdb
+F:\Tmmp\EntityFac\EntityFac\obj\Debug\EntityFac.csprojResolveAssemblyReference.cache
+F:\Tmmp\EntityFac\EntityFac\obj\Debug\EntityFac.Form1.resources
+F:\Tmmp\EntityFac\EntityFac\obj\Debug\EntityFac.Properties.Resources.resources
+F:\Tmmp\EntityFac\EntityFac\obj\Debug\EntityFac.csproj.GenerateResource.Cache
