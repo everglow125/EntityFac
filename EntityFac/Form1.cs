@@ -193,7 +193,7 @@ namespace EntityFac
                         sw.WriteLine("using System;");
                         sw.WriteLine("namespace " + this.txtNameSpace.Text);
                         sw.WriteLine("{");
-                        sw.WriteLine("\tpublic class " + tableName);
+                        sw.WriteLine("\tpublic partial class " + tableName);
                         sw.WriteLine("\t{");
                         foreach (DataRow dr in temp.Rows)
                         {
