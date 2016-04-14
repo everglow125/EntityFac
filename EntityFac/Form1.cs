@@ -207,8 +207,8 @@ namespace EntityFac
                     }
                     if (i == 0) file0 = fileName;
                 }
-                MessageBox.Show("文件生成成功");
                 OpenFileDir(file0);
+                MessageBox.Show("文件生成成功");
             }
             catch (Exception ex)
             {
