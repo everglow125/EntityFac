@@ -32,6 +32,7 @@ namespace EntityFac
 
         public static T Deserialize<T>()
         {
+            if (!File.Exists(GetPath())) return default(T);
             using (StreamReader file = new StreamReader(GetPath()))
             {
                 XmlSerializer xmlSearializer = new XmlSerializer(typeof(T));
