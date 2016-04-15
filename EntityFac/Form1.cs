@@ -362,7 +362,58 @@ namespace EntityFac
                 this.rtxtCode.Text = string.Format("UPDATE {1} WITH(ROWLOCK) \r\nSET {0})", sbSql.ToString().TrimStart(','), tableName);
             else
                 this.rtxtCode.Text = sbSql.ToString().TrimStart(',');
+            if (this.chxCopy.Checked)
+                CopyText(this.rtxtCode.Text);
 
+        }
+
+
+        /// <summary>
+        /// 复制或剪切文件至剪贴板(方法）
+        /// </summary>
+        /// <param name="files">需要添加到剪切板的文件路径数组</param>
+        /// <param name="cut">是否剪切true为剪切，false为复制</param>
+        public static void CopyToClipboard(string[] files, bool cut)
+        {
+            if (files == null) return;
+            IDataObject data = new DataObject(DataFormats.FileDrop, files);
+            MemoryStream memo = new MemoryStream(4);
+            byte[] bytes = new byte[] { (byte)(cut ? 2 : 5), 0, 0, 0 };
+            memo.Write(bytes, 0, bytes.Length);
+            data.SetData("Preferred DropEffect", memo);
+            Clipboard.SetDataObject(data);
+        }
+        /// <summary>
+        /// 获取剪贴板中的文件列表（方法）
+        /// </summary>
+        /// <returns>System.Collections.List<string>返回剪切板中文件路径集合</returns>
+        public static List<string> GetClipboardList()
+        {
+            List<string> clipboardList = new List<string>();
+            System.Collections.Specialized.StringCollection sc = Clipboard.GetFileDropList();
+            for (int i = 0; i < sc.Count; i++)
+            {
+                string listfileName = sc[i];
+                clipboardList.Add(listfileName);
+            }
+            return clipboardList;
+        }
+
+
+        //复制： 
+        private void CopyText(string source)
+        {
+            Clipboard.SetDataObject(source);
+        }
+
+        //粘贴： 
+        private void PasteText(object sender, System.EventArgs e)
+        {
+            IDataObject iData = Clipboard.GetDataObject();
+            if (iData.GetDataPresent(DataFormats.Text))
+            {
+                var temp = (String)iData.GetData(DataFormats.Text);
+            }
         }
 
 

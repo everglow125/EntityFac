@@ -63,6 +63,7 @@
             this.label10 = new System.Windows.Forms.Label();
             this.btn_CreateCode = new System.Windows.Forms.Button();
             this.rtxtCode = new System.Windows.Forms.RichTextBox();
+            this.chxCopy = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -345,6 +346,7 @@
             // 
             // groupBox6
             // 
+            this.groupBox6.Controls.Add(this.chxCopy);
             this.groupBox6.Controls.Add(this.btn_CreateCode);
             this.groupBox6.Controls.Add(this.cbxCodeType);
             this.groupBox6.Controls.Add(this.label10);
@@ -393,7 +395,7 @@
             // 
             // btn_CreateCode
             // 
-            this.btn_CreateCode.Location = new System.Drawing.Point(29, 108);
+            this.btn_CreateCode.Location = new System.Drawing.Point(26, 149);
             this.btn_CreateCode.Name = "btn_CreateCode";
             this.btn_CreateCode.Size = new System.Drawing.Size(148, 52);
             this.btn_CreateCode.TabIndex = 12;
@@ -409,6 +411,16 @@
             this.rtxtCode.Size = new System.Drawing.Size(595, 354);
             this.rtxtCode.TabIndex = 1;
             this.rtxtCode.Text = "";
+            // 
+            // chxCopy
+            // 
+            this.chxCopy.AutoSize = true;
+            this.chxCopy.Location = new System.Drawing.Point(74, 108);
+            this.chxCopy.Name = "chxCopy";
+            this.chxCopy.Size = new System.Drawing.Size(120, 16);
+            this.chxCopy.TabIndex = 16;
+            this.chxCopy.Text = "复制代码到剪贴板";
+            this.chxCopy.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -470,6 +482,7 @@
         private System.Windows.Forms.ComboBox cbxTable;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.CheckBox chxCopy;
     }
 }
 
