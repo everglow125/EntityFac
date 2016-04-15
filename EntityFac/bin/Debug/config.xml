@@ -3,8 +3,9 @@
   <ServerAddress>SZC062\SQLEXPRESS</ServerAddress>
   <Account>sa</Account>
   <Password>123456</Password>
+  <DataBase>SCF</DataBase>
   <NameSpace>Temp</NameSpace>
   <Prefix>dt_</Prefix>
   <FilePath>E:\Entity</FilePath>
-  <ConnectionString>Data Source=SZC062\SQLEXPRESS;User Id=sa;Password=123456;Initial Catalog=Mblog;</ConnectionString>
+  <ConnectionString>Data Source=SZC062\SQLEXPRESS;User Id=sa;Password=123456;Initial Catalog=SCF;</ConnectionString>
 </ConfigInfo>

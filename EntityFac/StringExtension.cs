@@ -48,6 +48,7 @@ namespace EntityFac
         }
         public static string ToDBType(this string type, string length)
         {
+            if (length == "-1") length = "MAX";
             switch (type.ToLower())
             {
                 case "binary": return "Binary";

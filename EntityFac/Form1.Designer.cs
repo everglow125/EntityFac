@@ -64,6 +64,9 @@
             this.btn_CreateCode = new System.Windows.Forms.Button();
             this.rtxtCode = new System.Windows.Forms.RichTextBox();
             this.chxCopy = new System.Windows.Forms.CheckBox();
+            this.btnProcedure = new System.Windows.Forms.Button();
+            this.chxProcedure = new System.Windows.Forms.ComboBox();
+            this.label11 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -223,6 +226,7 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.btnSelectAll);
             this.groupBox2.Controls.Add(this.button1);
             this.groupBox2.Controls.Add(this.txtPrefix);
             this.groupBox2.Controls.Add(this.label8);
@@ -283,10 +287,9 @@
             // 
             // btnSelectAll
             // 
-            this.btnSelectAll.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.btnSelectAll.Location = new System.Drawing.Point(3, 348);
+            this.btnSelectAll.Location = new System.Drawing.Point(19, 32);
             this.btnSelectAll.Name = "btnSelectAll";
-            this.btnSelectAll.Size = new System.Drawing.Size(368, 23);
+            this.btnSelectAll.Size = new System.Drawing.Size(75, 23);
             this.btnSelectAll.TabIndex = 6;
             this.btnSelectAll.Text = "全选";
             this.btnSelectAll.UseVisualStyleBackColor = true;
@@ -324,7 +327,6 @@
             // 
             // groupBox4
             // 
-            this.groupBox4.Controls.Add(this.btnSelectAll);
             this.groupBox4.Controls.Add(this.chkTables);
             this.groupBox4.Dock = System.Windows.Forms.DockStyle.Left;
             this.groupBox4.Location = new System.Drawing.Point(3, 17);
@@ -346,31 +348,35 @@
             // 
             // groupBox6
             // 
+            this.groupBox6.Controls.Add(this.btnProcedure);
+            this.groupBox6.Controls.Add(this.chxProcedure);
+            this.groupBox6.Controls.Add(this.label11);
             this.groupBox6.Controls.Add(this.chxCopy);
             this.groupBox6.Controls.Add(this.btn_CreateCode);
             this.groupBox6.Controls.Add(this.cbxCodeType);
             this.groupBox6.Controls.Add(this.label10);
             this.groupBox6.Controls.Add(this.cbxTable);
             this.groupBox6.Controls.Add(this.label9);
-            this.groupBox6.Dock = System.Windows.Forms.DockStyle.Left;
+            this.groupBox6.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupBox6.Location = new System.Drawing.Point(3, 17);
             this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(214, 354);
+            this.groupBox6.Size = new System.Drawing.Size(809, 89);
             this.groupBox6.TabIndex = 0;
             this.groupBox6.TabStop = false;
             // 
             // cbxTable
             // 
             this.cbxTable.FormattingEnabled = true;
-            this.cbxTable.Location = new System.Drawing.Point(68, 20);
+            this.cbxTable.Location = new System.Drawing.Point(235, 19);
             this.cbxTable.Name = "cbxTable";
             this.cbxTable.Size = new System.Drawing.Size(126, 20);
             this.cbxTable.TabIndex = 13;
+            this.cbxTable.SelectedValueChanged += new System.EventHandler(this.cbxTable_SelectedValueChanged);
             // 
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(24, 23);
+            this.label9.Location = new System.Drawing.Point(191, 22);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(29, 12);
             this.label9.TabIndex = 12;
@@ -379,15 +385,16 @@
             // cbxCodeType
             // 
             this.cbxCodeType.FormattingEnabled = true;
-            this.cbxCodeType.Location = new System.Drawing.Point(68, 60);
+            this.cbxCodeType.Location = new System.Drawing.Point(466, 19);
             this.cbxCodeType.Name = "cbxCodeType";
             this.cbxCodeType.Size = new System.Drawing.Size(126, 20);
             this.cbxCodeType.TabIndex = 15;
+            this.cbxCodeType.SelectedIndexChanged += new System.EventHandler(this.cbxCodeType_SelectedIndexChanged);
             // 
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(0, 63);
+            this.label10.Location = new System.Drawing.Point(398, 22);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(53, 12);
             this.label10.TabIndex = 14;
@@ -395,9 +402,9 @@
             // 
             // btn_CreateCode
             // 
-            this.btn_CreateCode.Location = new System.Drawing.Point(26, 149);
+            this.btn_CreateCode.Location = new System.Drawing.Point(655, 19);
             this.btn_CreateCode.Name = "btn_CreateCode";
-            this.btn_CreateCode.Size = new System.Drawing.Size(148, 52);
+            this.btn_CreateCode.Size = new System.Drawing.Size(131, 25);
             this.btn_CreateCode.TabIndex = 12;
             this.btn_CreateCode.Text = "生成代码";
             this.btn_CreateCode.UseVisualStyleBackColor = true;
@@ -406,21 +413,49 @@
             // rtxtCode
             // 
             this.rtxtCode.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.rtxtCode.Location = new System.Drawing.Point(217, 17);
+            this.rtxtCode.Location = new System.Drawing.Point(3, 106);
             this.rtxtCode.Name = "rtxtCode";
-            this.rtxtCode.Size = new System.Drawing.Size(595, 354);
+            this.rtxtCode.Size = new System.Drawing.Size(809, 265);
             this.rtxtCode.TabIndex = 1;
             this.rtxtCode.Text = "";
             // 
             // chxCopy
             // 
             this.chxCopy.AutoSize = true;
-            this.chxCopy.Location = new System.Drawing.Point(74, 108);
+            this.chxCopy.Location = new System.Drawing.Point(25, 24);
             this.chxCopy.Name = "chxCopy";
             this.chxCopy.Size = new System.Drawing.Size(120, 16);
             this.chxCopy.TabIndex = 16;
             this.chxCopy.Text = "复制代码到剪贴板";
             this.chxCopy.UseVisualStyleBackColor = true;
+            // 
+            // btnProcedure
+            // 
+            this.btnProcedure.Location = new System.Drawing.Point(655, 51);
+            this.btnProcedure.Name = "btnProcedure";
+            this.btnProcedure.Size = new System.Drawing.Size(131, 29);
+            this.btnProcedure.TabIndex = 17;
+            this.btnProcedure.Text = "调用存储过程代码";
+            this.btnProcedure.UseVisualStyleBackColor = true;
+            this.btnProcedure.Click += new System.EventHandler(this.btnProcedure_Click);
+            // 
+            // chxProcedure
+            // 
+            this.chxProcedure.FormattingEnabled = true;
+            this.chxProcedure.Location = new System.Drawing.Point(235, 51);
+            this.chxProcedure.Name = "chxProcedure";
+            this.chxProcedure.Size = new System.Drawing.Size(357, 20);
+            this.chxProcedure.TabIndex = 19;
+            this.chxProcedure.SelectedValueChanged += new System.EventHandler(this.chxProcedure_SelectedValueChanged);
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(167, 54);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(53, 12);
+            this.label11.TabIndex = 18;
+            this.label11.Text = "存储过程";
             // 
             // Form1
             // 
@@ -483,6 +518,9 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.CheckBox chxCopy;
+        private System.Windows.Forms.Button btnProcedure;
+        private System.Windows.Forms.ComboBox chxProcedure;
+        private System.Windows.Forms.Label label11;
     }
 }
 

@@ -37,6 +37,12 @@ namespace EntityFac
                                             JOIN INFORMATION_SCHEMA.COLUMNS T5 ON T1.name = T5.COLUMN_NAME
                                                                                     AND T5.TABLE_NAME = '{0}'
                                     WHERE   T3.name = '{0}';";
+        private static string queryProcedure = "select name from dbo.sysobjects where OBJECTPROPERTY(id, N'IsProcedure') = 1 order by name ";
+        private static string queryParms =
+                                    @"   select name , type_name(xusertype) typename, length   
+	                                     FROM    syscolumns 
+                                         WHERE   id=object_id('{0}')
+                                         ORDER BY colid";
         #endregion
 
         public Form1()
@@ -47,7 +53,7 @@ namespace EntityFac
             if (cfg != null)
             {
                 if (cfg.ConnectionString != "")
-                    this.txtConnection.Text = ConfigurationManager.AppSettings["connectionStr"];
+                    this.txtConnection.Text = cfg.ConnectionString;
                 else
                 {
                     string connection = string.Format("Data Source={0};User Id={1};Password={2};"
@@ -152,6 +158,11 @@ namespace EntityFac
                 this.cbxTable.DataSource = dt;
                 this.cbxTable.ValueMember = "name";
                 this.cbxTable.DisplayMember = "name";
+
+                DataTable dtProcedure = ExecuteDataTable(this.txtConnection.Text, queryProcedure);
+                this.chxProcedure.DataSource = dtProcedure;
+                this.chxProcedure.ValueMember = "name";
+                this.chxProcedure.DisplayMember = "name";
             }
             catch (Exception ex)
             {
@@ -331,6 +342,11 @@ namespace EntityFac
 
         private void btn_CreateCode_Click(object sender, EventArgs e)
         {
+            if (this.cbxTable.DataSource == null || this.cbxTable.Items.Count == 0)
+            {
+                MessageBox.Show(this, "不存在存数据表", "异常", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
             string codeType = this.cbxCodeType.SelectedValue.ToString();
             string tableName = this.cbxTable.SelectedValue.ToString();
             var dt = ExecuteDataTable(this.txtConnection.Text, string.Format(queryColumns, tableName));
@@ -350,16 +366,16 @@ namespace EntityFac
                     sbParm.AppendFormat(",@{0}", columnName);
                 }
                 else if (codeType == "Declare")
-                    sbSql.AppendFormat("\r\nDECLARE @{0} {1};", columnName, dr["columnType"].ToString().ToDBType(dr["MaxLength"].ToString()));
+                    sbSql.AppendFormat("DECLARE @{0} {1};\r\n", columnName, dr["columnType"].ToString().ToDBType(dr["MaxLength"].ToString()));
                 else
-                    sbSql.Append("\r\nnew SqlParameter(\"@" + columnName + "\",SqlDbType." + dr["ColumnType"].ToString().ToDBType() + ","
-                        + dr["MaxLength"].ToString() + ") { Value=model." + columnName + " };");
+                    sbSql.Append("new SqlParameter(\"@" + columnName + "\",SqlDbType." + dr["ColumnType"].ToString().ToDBType() + ","
+                        + dr["MaxLength"].ToString() + ") { Value=model." + columnName + " };\r\n");
 
             }
             if (codeType == "Insert") this.rtxtCode.Text = string.Format("INSERT INTO {2}\r\n({0})\r\nVALUES\r\n({1})"
                 , sbSql.ToString().TrimStart(','), sbParm.ToString().TrimStart(','), tableName);
             else if (codeType == "Update")
-                this.rtxtCode.Text = string.Format("UPDATE {1} WITH(ROWLOCK) \r\nSET {0})", sbSql.ToString().TrimStart(','), tableName);
+                this.rtxtCode.Text = string.Format("UPDATE {1} WITH(ROWLOCK) \r\nSET {0}", sbSql.ToString().TrimStart(','), tableName);
             else
                 this.rtxtCode.Text = sbSql.ToString().TrimStart(',');
             if (this.chxCopy.Checked)
@@ -414,6 +430,48 @@ namespace EntityFac
             {
                 var temp = (String)iData.GetData(DataFormats.Text);
             }
+        }
+
+        private void btnProcedure_Click(object sender, EventArgs e)
+        {
+            if (this.chxProcedure.DataSource == null || this.chxProcedure.Items.Count == 0)
+            {
+                MessageBox.Show(this, "不存在存储过程", "异常", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            string procedure = this.chxProcedure.SelectedValue.ToString();
+            DataTable dt = ExecuteDataTable(this.txtConnection.Text, string.Format(queryParms, procedure));
+            StringBuilder sbSql = new StringBuilder();
+            StringBuilder sbParm = new StringBuilder();
+            foreach (DataRow dr in dt.Rows)
+            {
+                sbSql.AppendFormat("DECLARE {0} {1}=NULL;\r\n", dr["name"].ToString().StartWithUpper(), dr["typeName"].ToString().ToDBType(dr["length"].ToString()));
+                sbParm.AppendFormat(",{0}", dr["name"].ToString().StartWithUpper());
+            }
+            this.rtxtCode.Text = string.Format("{0}\r\nEXEC {1} {2}", sbSql.ToString(), procedure, sbParm.ToString().TrimStart(','));
+            if (this.chxCopy.Checked)
+                CopyText(this.rtxtCode.Text);
+        }
+
+
+        private void ClearText()
+        {
+            this.rtxtCode.Text = "";
+        }
+
+        private void cbxTable_SelectedValueChanged(object sender, EventArgs e)
+        {
+            ClearText();
+        }
+
+        private void cbxCodeType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ClearText();
+        }
+
+        private void chxProcedure_SelectedValueChanged(object sender, EventArgs e)
+        {
+            ClearText();
         }
 
 
