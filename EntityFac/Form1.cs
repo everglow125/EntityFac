@@ -178,34 +178,15 @@ namespace EntityFac
                     DataRowView dv = ((DataRowView)cbxTables.CheckedItems[i]);
                     if (dv == null) continue;
                     string tableName = dv["name"].ToString();
-                    var temp = ExecuteDataTable(this.txtConnection.Text, string.Format(queryColumns, tableName));
+                    var dt = ExecuteDataTable(this.txtConnection.Text, string.Format(queryColumns, tableName));
                     if (this.txtPrefix.Text != "" && dv["name"].ToString().StartsWith(this.txtPrefix.Text.Trim()))
                     {
                         tableName = dv["name"].ToString().Substring(this.txtPrefix.Text.Length);
                     }
                     tableName = tableName.StartWithUpper();
-                    string fileName = this.txtAddress.Text.Trim() + "\\" + tableName + ".cs";
-                    FileInfo file = new FileInfo(fileName);
-                    if (!file.Directory.Exists)
-                        file.Directory.Create();
-                    using (StreamWriter sw = new StreamWriter(fileName))
-                    {
-                        sw.WriteLine("using System;");
-                        sw.WriteLine("namespace " + this.txtNameSpace.Text);
-                        sw.WriteLine("{");
-                        sw.WriteLine("\tpublic partial class " + tableName);
-                        sw.WriteLine("\t{");
-                        foreach (DataRow dr in temp.Rows)
-                        {
-                            sw.WriteLine("\t\t/// <summary>");
-                            sw.WriteLine("\t\t/// " + dr["Comment"].ToString());
-                            sw.WriteLine("\t\t/// <summary>");
-                            sw.WriteLine("\t\tpublic " + GetDataType(dr["ColumnType"].ToString()) + " " + dr["ColumnName"].ToString().StartWithUpper() + " { get; set; }");
-                        }
-                        sw.WriteLine("\t}");
-                        sw.WriteLine("}");
-                    }
-                    if (i == 0) file0 = fileName;
+                    if (i == 0) file0 = this.txtAddress.Text.Trim() + "\\Entity\\" + tableName + ".cs";
+
+                    CreateEntity(tableName, dt);
                 }
                 OpenFileDir(file0);
                 MessageBox.Show("文件生成成功");
@@ -216,6 +197,56 @@ namespace EntityFac
             }
 
         }
+
+        private void CreateEntity(string tableName, DataTable dt)
+        {
+            string fileName = this.txtAddress.Text.Trim() + "\\Dal\\" + tableName + ".cs";
+            FileInfo file = new FileInfo(fileName);
+            if (!file.Directory.Exists)
+                file.Directory.Create();
+            using (StreamWriter sw = new StreamWriter(fileName))
+            {
+                sw.WriteLine("using System;");
+                sw.WriteLine("namespace " + this.txtNameSpace.Text);
+                sw.WriteLine("{");
+                sw.WriteLine("\tpublic partial class " + tableName + "Dal");
+                sw.WriteLine("\t{");
+
+                foreach (DataRow dr in dt.Rows)
+                {
+                    /*后续写Dal层*/
+                }
+                sw.WriteLine("\t}");
+                sw.WriteLine("}");
+            }
+        }
+
+
+        private void CreateDal(string tableName, DataTable dt)
+        {
+            string fileName = this.txtAddress.Text.Trim() + "\\Entity\\" + tableName + ".cs";
+            FileInfo file = new FileInfo(fileName);
+            if (!file.Directory.Exists)
+                file.Directory.Create();
+            using (StreamWriter sw = new StreamWriter(fileName))
+            {
+                sw.WriteLine("using System;");
+                sw.WriteLine("namespace " + this.txtNameSpace.Text);
+                sw.WriteLine("{");
+                sw.WriteLine("\tpublic partial class " + tableName);
+                sw.WriteLine("\t{");
+                foreach (DataRow dr in dt.Rows)
+                {
+                    sw.WriteLine("\t\t/// <summary>");
+                    sw.WriteLine("\t\t/// " + dr["Comment"].ToString());
+                    sw.WriteLine("\t\t/// <summary>");
+                    sw.WriteLine("\t\tpublic " + GetDataType(dr["ColumnType"].ToString()) + " " + dr["ColumnName"].ToString().StartWithUpper() + " { get; set; }");
+                }
+                sw.WriteLine("\t}");
+                sw.WriteLine("}");
+            }
+        }
+
 
         private void OpenFileDir(string filePath)
         {
