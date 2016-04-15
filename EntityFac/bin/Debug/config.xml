@@ -5,6 +5,6 @@
   <Password>123456</Password>
   <NameSpace>Temp</NameSpace>
   <Prefix>dt_</Prefix>
-  <FilePath>SZC062\SQLEXPRESS</FilePath>
+  <FilePath>E:\Entity</FilePath>
   <ConnectionString>Data Source=SZC062\SQLEXPRESS;User Id=sa;Password=123456;Initial Catalog=Mblog;</ConnectionString>
 </ConfigInfo>

@@ -43,6 +43,7 @@ namespace EntityFac
         {
             InitializeComponent();
             var cfg = SerializeHelper.Deserialize<ConfigInfo>();
+            List<string> codeTypes = new List<string> { "SqlParameter", "Insert", "Update", "Declare" };
             if (cfg != null)
             {
                 if (cfg.ConnectionString != "")
@@ -65,6 +66,8 @@ namespace EntityFac
                 this.txtNameSpace.Text = cfg.NameSpace;
                 this.txtPrefix.Text = cfg.Prefix;
                 this.txtAddress.Text = cfg.FilePath;
+
+                this.cbxCodeType.DataSource = codeTypes;
             }
         }
 
@@ -110,7 +113,7 @@ namespace EntityFac
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(this, ex.Message, "异常", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -130,7 +133,7 @@ namespace EntityFac
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(this, ex.Message, "异常", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -138,14 +141,21 @@ namespace EntityFac
         {
             try
             {
+                this.chkTables.DataSource = null;
+                this.cbxTable.DataSource = null;
+
                 DataTable dt = ExecuteDataTable(this.txtConnection.Text, queryTables);
-                this.cbxTables.DataSource = dt;
-                this.cbxTables.ValueMember = "name";
-                this.cbxTables.DisplayMember = "name";
+                this.chkTables.DataSource = dt;
+                this.chkTables.ValueMember = "name";
+                this.chkTables.DisplayMember = "name";
+
+                this.cbxTable.DataSource = dt;
+                this.cbxTable.ValueMember = "name";
+                this.cbxTable.DisplayMember = "name";
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(this, ex.Message, "异常", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -153,14 +163,14 @@ namespace EntityFac
         {
             try
             {
-                for (int i = 0; i < cbxTables.Items.Count; i++)
+                for (int i = 0; i < chkTables.Items.Count; i++)
                 {
-                    cbxTables.SetItemCheckState(i, CheckState.Checked);
+                    chkTables.SetItemCheckState(i, CheckState.Checked);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(this, ex.Message, "异常", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -168,21 +178,23 @@ namespace EntityFac
         {
             if (this.txtAddress.Text.Trim() == "")
             {
-                MessageBox.Show("文件保存路径不能为空");
+                MessageBox.Show(this, "文件保存路径不能为空", "警告", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
             if (this.txtNameSpace.Text.Trim() == "")
             {
-                MessageBox.Show("NameSpace不能为空");
+                MessageBox.Show(this, "NameSpace不能为空", "警告", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
             try
             {
                 var file0 = "";
-                for (int i = 0; i < cbxTables.CheckedItems.Count; i++)
+                int selectCount = 0;
+                for (int i = 0; i < chkTables.CheckedItems.Count; i++)
                 {
-                    DataRowView dv = ((DataRowView)cbxTables.CheckedItems[i]);
+                    DataRowView dv = ((DataRowView)chkTables.CheckedItems[i]);
                     if (dv == null) continue;
+                    selectCount++;
                     string tableName = dv["name"].ToString();
                     var dt = ExecuteDataTable(this.txtConnection.Text, string.Format(queryColumns, tableName));
                     if (this.txtPrefix.Text != "" && dv["name"].ToString().StartsWith(this.txtPrefix.Text.Trim()))
@@ -195,12 +207,14 @@ namespace EntityFac
                     CreateEntity(tableName, dt);
                     CreateDal(tableName, dt);
                 }
-                OpenFileDir(file0);
-                MessageBox.Show("文件生成成功");
+                if (selectCount == 0)
+                    MessageBox.Show(this, "『未选中任何表格』", "警告", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                else
+                    OpenFileDir(file0);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(this, ex.Message, "异常", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
         }
@@ -224,17 +238,20 @@ namespace EntityFac
                 StringBuilder sbSql = new StringBuilder();
                 StringBuilder sbInsert = new StringBuilder();
                 StringBuilder sbParms = new StringBuilder();
+                StringBuilder sbDeclare = new StringBuilder();
                 foreach (DataRow dr in dt.Rows)
                 {
                     var columnName = dr["ColumnName"].ToString().StartWithUpper();
                     sbSql.AppendLine(string.Format(",[{0}]=@{0}", columnName));
-                    sw.WriteLine("\t\t\tnew SqlParameter(\"@" + columnName + "\",SqlDbType." + GetDBType(dr["ColumnType"].ToString()) + ","
+                    sw.WriteLine("\t\t\tnew SqlParameter(\"@" + columnName + "\",SqlDbType." + dr["ColumnType"].ToString().ToDBType() + ","
                         + dr["MaxLength"].ToString() + ") { Value=model." + columnName + " };");
                     sbInsert.AppendFormat(",[{0}]", columnName);
                     sbParms.AppendFormat(",@{0}", columnName);
+                    sbDeclare.AppendFormat("\nDECLARE @{0} {1};", columnName, dr["columnType"].ToString().ToDBType(dr["MaxLength"].ToString()));
                 }
                 sw.WriteLine("\t\t string sqlUpdate=\n@\"" + sbSql.ToString() + "\";");
                 sw.WriteLine("\t\t string sqlInsert=@\"(" + sbInsert.ToString().TrimStart(',') + ") values (" + sbParms.ToString().TrimStart(',') + ")\";");
+                sw.WriteLine("\t\t string declare=\n@\"" + sbDeclare.ToString() + "\";");
                 sw.WriteLine("\t\t}");
                 sw.WriteLine("\t}");
                 sw.WriteLine("}");
@@ -260,7 +277,7 @@ namespace EntityFac
                     sw.WriteLine("\t\t/// <summary>");
                     sw.WriteLine("\t\t/// " + dr["Comment"].ToString());
                     sw.WriteLine("\t\t/// <summary>");
-                    sw.WriteLine("\t\tpublic " + GetDataType(dr["ColumnType"].ToString()) + " " + dr["ColumnName"].ToString().StartWithUpper() + " { get; set; }");
+                    sw.WriteLine("\t\tpublic " + dr["ColumnType"].ToString().ToDataType() + " " + dr["ColumnName"].ToString().StartWithUpper() + " { get; set; }");
                 }
                 sw.WriteLine("\t}");
                 sw.WriteLine("}");
@@ -309,68 +326,46 @@ namespace EntityFac
             cfg.Prefix = this.txtPrefix.Text;
             cfg.ServerAddress = this.txtServerAddress.Text;
             SerializeHelper.Serialize<ConfigInfo>(cfg);
+            MessageBox.Show(this, "保存配置成功", "异常", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private string GetDBType(string type)
+        private void btn_CreateCode_Click(object sender, EventArgs e)
         {
-            switch (type.ToLower())
+            string codeType = this.cbxCodeType.SelectedValue.ToString();
+            string tableName = this.cbxTable.SelectedValue.ToString();
+            var dt = ExecuteDataTable(this.txtConnection.Text, string.Format(queryColumns, tableName));
+
+
+            StringBuilder sbSql = new StringBuilder();
+            StringBuilder sbParm = new StringBuilder();
+
+            foreach (DataRow dr in dt.Rows)
             {
-                case "binary": return "Binary";
-                case "varbinary": return "VarBinary";
-                case "image": return "Image";
-                case "varchar": return "VarChar";
-                case "nvarchar": return "NVarChar";
-                case "text": return "Text";
-                case "ntext": return "NText";
-                case "char": return "Char";
-                case "int": return "Int";
-                case "nchar": return "NChar";
-                case "bigint": return "BigInt";
-                case "real": return "Real";
-                case "float": return "Float";
-                case "bit": return "Bit";
-                case "tinyint": return "TinyInt";
-                case "smallint": return "SmallInt";
-                case "date": return "Date";
-                case "timestamp": return "TimeStamp";
-                case "datetime": return "DateTime";
-                case "money": return "Money";
-                case "smallmoney": return "SmallMoney";
-                case "numeric": return "Numeric";
-                default: return "";
-            }
-        }
-        private string GetDataType(string DBTypeValue)
-        {
-            string result = "";
-            switch (DBTypeValue.ToLower())
-            {
-                case "binary":
-                case "varbinary":
-                case "image":
-                case "varchar":
-                case "nvarchar":
-                case "text":
-                case "ntext":
-                case "char":
-                case "nchar": result = "string"; break;
-                case "bigint": result = "long"; break;
-                case "real":
-                case "float": result = "double"; break;
-                case "bit": result = "bool"; break;
-                case "tinyint":
-                case "smallint": result = "int"; break;
-                case "date":
-                case "timestamp":
-                case "datetime": result = "DateTime"; break;
-                case "money":
-                case "smallmoney":
-                case "numeric": result = "decimal"; break;
-                default: result = DBTypeValue; break;
+                var columnName = dr["ColumnName"].ToString().StartWithUpper();
+                if (codeType == "Update")
+                    sbSql.AppendLine(string.Format(",[{0}]=@{0}", columnName));
+                else if (codeType == "Insert")
+                {
+                    sbSql.AppendFormat(",[{0}]", columnName);
+                    sbParm.AppendFormat(",@{0}", columnName);
+                }
+                else if (codeType == "Declare")
+                    sbSql.AppendFormat("\r\nDECLARE @{0} {1};", columnName, dr["columnType"].ToString().ToDBType(dr["MaxLength"].ToString()));
+                else
+                    sbSql.Append("\r\nnew SqlParameter(\"@" + columnName + "\",SqlDbType." + dr["ColumnType"].ToString().ToDBType() + ","
+                        + dr["MaxLength"].ToString() + ") { Value=model." + columnName + " };");
 
             }
-            return result;
+            if (codeType == "Insert") this.rtxtCode.Text = string.Format("INSERT INTO {2}\r\n({0})\r\nVALUES\r\n({1})"
+                , sbSql.ToString().TrimStart(','), sbParm.ToString().TrimStart(','), tableName);
+            else if (codeType == "Update")
+                this.rtxtCode.Text = string.Format("UPDATE {1} WITH(ROWLOCK) \r\nSET {0})", sbSql.ToString().TrimStart(','), tableName);
+            else
+                this.rtxtCode.Text = sbSql.ToString().TrimStart(',');
+
         }
+
+
 
     }
 }

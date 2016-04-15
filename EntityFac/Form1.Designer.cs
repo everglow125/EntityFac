@@ -52,11 +52,23 @@
             this.btnSelectPath = new System.Windows.Forms.Button();
             this.btnSelectAll = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.cbxTables = new System.Windows.Forms.CheckedListBox();
+            this.chkTables = new System.Windows.Forms.CheckedListBox();
             this.button1 = new System.Windows.Forms.Button();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.cbxTable = new System.Windows.Forms.ComboBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.cbxCodeType = new System.Windows.Forms.ComboBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.btn_CreateCode = new System.Windows.Forms.Button();
+            this.rtxtCode = new System.Windows.Forms.RichTextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
+            this.groupBox4.SuspendLayout();
+            this.groupBox5.SuspendLayout();
+            this.groupBox6.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnConnectSQL
@@ -131,7 +143,6 @@
             this.groupBox1.Size = new System.Drawing.Size(1195, 125);
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "groupBox1";
             // 
             // btnQueryTable
             // 
@@ -217,7 +228,6 @@
             this.groupBox2.Controls.Add(this.txtNameSpace);
             this.groupBox2.Controls.Add(this.label7);
             this.groupBox2.Controls.Add(this.btnSelectPath);
-            this.groupBox2.Controls.Add(this.btnSelectAll);
             this.groupBox2.Controls.Add(this.txtAddress);
             this.groupBox2.Controls.Add(this.btnCreateFile);
             this.groupBox2.Controls.Add(this.label2);
@@ -227,7 +237,6 @@
             this.groupBox2.Size = new System.Drawing.Size(1195, 138);
             this.groupBox2.TabIndex = 7;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "groupBox2";
             // 
             // txtPrefix
             // 
@@ -273,9 +282,10 @@
             // 
             // btnSelectAll
             // 
-            this.btnSelectAll.Location = new System.Drawing.Point(19, 36);
+            this.btnSelectAll.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.btnSelectAll.Location = new System.Drawing.Point(3, 348);
             this.btnSelectAll.Name = "btnSelectAll";
-            this.btnSelectAll.Size = new System.Drawing.Size(75, 23);
+            this.btnSelectAll.Size = new System.Drawing.Size(368, 23);
             this.btnSelectAll.TabIndex = 6;
             this.btnSelectAll.Text = "全选";
             this.btnSelectAll.UseVisualStyleBackColor = true;
@@ -283,23 +293,23 @@
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.cbxTables);
+            this.groupBox3.Controls.Add(this.groupBox5);
+            this.groupBox3.Controls.Add(this.groupBox4);
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox3.Location = new System.Drawing.Point(0, 125);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(1195, 394);
             this.groupBox3.TabIndex = 8;
             this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "groupBox3";
             // 
-            // cbxTables
+            // chkTables
             // 
-            this.cbxTables.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cbxTables.FormattingEnabled = true;
-            this.cbxTables.Location = new System.Drawing.Point(3, 17);
-            this.cbxTables.Name = "cbxTables";
-            this.cbxTables.Size = new System.Drawing.Size(1189, 374);
-            this.cbxTables.TabIndex = 0;
+            this.chkTables.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.chkTables.FormattingEnabled = true;
+            this.chkTables.Location = new System.Drawing.Point(3, 17);
+            this.chkTables.Name = "chkTables";
+            this.chkTables.Size = new System.Drawing.Size(368, 354);
+            this.chkTables.TabIndex = 0;
             // 
             // button1
             // 
@@ -310,6 +320,95 @@
             this.button1.Text = "保存配置";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.btnSelectAll);
+            this.groupBox4.Controls.Add(this.chkTables);
+            this.groupBox4.Dock = System.Windows.Forms.DockStyle.Left;
+            this.groupBox4.Location = new System.Drawing.Point(3, 17);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(374, 374);
+            this.groupBox4.TabIndex = 1;
+            this.groupBox4.TabStop = false;
+            // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.rtxtCode);
+            this.groupBox5.Controls.Add(this.groupBox6);
+            this.groupBox5.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupBox5.Location = new System.Drawing.Point(377, 17);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(815, 374);
+            this.groupBox5.TabIndex = 2;
+            this.groupBox5.TabStop = false;
+            // 
+            // groupBox6
+            // 
+            this.groupBox6.Controls.Add(this.btn_CreateCode);
+            this.groupBox6.Controls.Add(this.cbxCodeType);
+            this.groupBox6.Controls.Add(this.label10);
+            this.groupBox6.Controls.Add(this.cbxTable);
+            this.groupBox6.Controls.Add(this.label9);
+            this.groupBox6.Dock = System.Windows.Forms.DockStyle.Left;
+            this.groupBox6.Location = new System.Drawing.Point(3, 17);
+            this.groupBox6.Name = "groupBox6";
+            this.groupBox6.Size = new System.Drawing.Size(214, 354);
+            this.groupBox6.TabIndex = 0;
+            this.groupBox6.TabStop = false;
+            // 
+            // cbxTable
+            // 
+            this.cbxTable.FormattingEnabled = true;
+            this.cbxTable.Location = new System.Drawing.Point(68, 20);
+            this.cbxTable.Name = "cbxTable";
+            this.cbxTable.Size = new System.Drawing.Size(126, 20);
+            this.cbxTable.TabIndex = 13;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(24, 23);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(29, 12);
+            this.label9.TabIndex = 12;
+            this.label9.Text = "表格";
+            // 
+            // cbxCodeType
+            // 
+            this.cbxCodeType.FormattingEnabled = true;
+            this.cbxCodeType.Location = new System.Drawing.Point(68, 60);
+            this.cbxCodeType.Name = "cbxCodeType";
+            this.cbxCodeType.Size = new System.Drawing.Size(126, 20);
+            this.cbxCodeType.TabIndex = 15;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(0, 63);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(53, 12);
+            this.label10.TabIndex = 14;
+            this.label10.Text = "代码类型";
+            // 
+            // btn_CreateCode
+            // 
+            this.btn_CreateCode.Location = new System.Drawing.Point(29, 108);
+            this.btn_CreateCode.Name = "btn_CreateCode";
+            this.btn_CreateCode.Size = new System.Drawing.Size(148, 52);
+            this.btn_CreateCode.TabIndex = 12;
+            this.btn_CreateCode.Text = "生成代码";
+            this.btn_CreateCode.UseVisualStyleBackColor = true;
+            this.btn_CreateCode.Click += new System.EventHandler(this.btn_CreateCode_Click);
+            // 
+            // rtxtCode
+            // 
+            this.rtxtCode.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.rtxtCode.Location = new System.Drawing.Point(217, 17);
+            this.rtxtCode.Name = "rtxtCode";
+            this.rtxtCode.Size = new System.Drawing.Size(595, 354);
+            this.rtxtCode.TabIndex = 1;
+            this.rtxtCode.Text = "";
             // 
             // Form1
             // 
@@ -326,6 +425,10 @@
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox5.ResumeLayout(false);
+            this.groupBox6.ResumeLayout(false);
+            this.groupBox6.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -341,7 +444,7 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.CheckedListBox cbxTables;
+        private System.Windows.Forms.CheckedListBox chkTables;
         private System.Windows.Forms.Button btnSelectAll;
         private System.Windows.Forms.Button btnSelectPath;
         private System.Windows.Forms.Button btnQueryTable;
@@ -358,6 +461,15 @@
         private System.Windows.Forms.TextBox txtNameSpace;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.GroupBox groupBox5;
+        private System.Windows.Forms.RichTextBox rtxtCode;
+        private System.Windows.Forms.GroupBox groupBox6;
+        private System.Windows.Forms.Button btn_CreateCode;
+        private System.Windows.Forms.ComboBox cbxCodeType;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.ComboBox cbxTable;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.GroupBox groupBox4;
     }
 }
 
