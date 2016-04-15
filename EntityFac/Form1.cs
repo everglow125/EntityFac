@@ -64,16 +64,10 @@ namespace EntityFac
 
                 this.txtNameSpace.Text = cfg.NameSpace;
                 this.txtPrefix.Text = cfg.Prefix;
-                this.txtAddress.Text = cfg.ServerAddress;
+                this.txtAddress.Text = cfg.FilePath;
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="constr"></param>
-        /// <param name="cmdText"></param>
-        /// <returns></returns>
         public DataTable ExecuteDataTable(string constr, string cmdText)
         {
             using (SqlConnection cnn = new SqlConnection(constr))
@@ -228,19 +222,93 @@ namespace EntityFac
                 sw.WriteLine("\t\tpublic void Insert(" + tableName + "Dal model)");
                 sw.WriteLine("\t\t{");
                 StringBuilder sbSql = new StringBuilder();
+                StringBuilder sbInsert = new StringBuilder();
+                StringBuilder sbParms = new StringBuilder();
                 foreach (DataRow dr in dt.Rows)
                 {
                     var columnName = dr["ColumnName"].ToString().StartWithUpper();
                     sbSql.AppendLine(string.Format(",[{0}]=@{0}", columnName));
                     sw.WriteLine("\t\t\tnew SqlParameter(\"@" + columnName + "\",SqlDbType." + GetDBType(dr["ColumnType"].ToString()) + ","
                         + dr["MaxLength"].ToString() + ") { Value=model." + columnName + " };");
+                    sbInsert.AppendFormat(",[{0}]", columnName);
+                    sbParms.AppendFormat(",@{0}", columnName);
                 }
-                sw.WriteLine("\t\t string sql=\n@\"" + sbSql.ToString() + "\";");
+                sw.WriteLine("\t\t string sqlUpdate=\n@\"" + sbSql.ToString() + "\";");
+                sw.WriteLine("\t\t string sqlInsert=@\"(" + sbInsert.ToString().TrimStart(',') + ") values (" + sbParms.ToString().TrimStart(',') + ")\";");
                 sw.WriteLine("\t\t}");
                 sw.WriteLine("\t}");
                 sw.WriteLine("}");
 
             }
+        }
+
+        private void CreateEntity(string tableName, DataTable dt)
+        {
+            string fileName = this.txtAddress.Text.Trim() + "\\Entity\\" + tableName + ".cs";
+            FileInfo file = new FileInfo(fileName);
+            if (!file.Directory.Exists)
+                file.Directory.Create();
+            using (StreamWriter sw = new StreamWriter(fileName))
+            {
+                sw.WriteLine("using System;");
+                sw.WriteLine("namespace " + this.txtNameSpace.Text + ".Entity");
+                sw.WriteLine("{");
+                sw.WriteLine("\tpublic partial class " + tableName);
+                sw.WriteLine("\t{");
+                foreach (DataRow dr in dt.Rows)
+                {
+                    sw.WriteLine("\t\t/// <summary>");
+                    sw.WriteLine("\t\t/// " + dr["Comment"].ToString());
+                    sw.WriteLine("\t\t/// <summary>");
+                    sw.WriteLine("\t\tpublic " + GetDataType(dr["ColumnType"].ToString()) + " " + dr["ColumnName"].ToString().StartWithUpper() + " { get; set; }");
+                }
+                sw.WriteLine("\t}");
+                sw.WriteLine("}");
+            }
+        }
+
+        private void OpenFileDir(string filePath)
+        {
+            Process open = new Process();
+            open.StartInfo.FileName = "explorer";
+            open.StartInfo.Arguments = @"/select," + filePath;
+            open.Start();
+        }
+
+        private void btnSelectPath_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                FolderBrowserDialog path = new FolderBrowserDialog();
+                path.ShowDialog();
+                this.txtAddress.Text = path.SelectedPath;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void UpdateConfig(string key, string value)
+        {
+            Configuration cfa = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            cfa.AppSettings.Settings[key].Value = "value";
+            cfa.Save();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            ConfigInfo cfg = new ConfigInfo();
+            cfg.Account = this.txtAccount.Text;
+            cfg.ConnectionString = this.txtConnection.Text;
+            if (this.cbxDataBase.DataSource != null)
+                cfg.DataBase = this.cbxDataBase.SelectedValue.ToString();
+            cfg.FilePath = this.txtAddress.Text;
+            cfg.NameSpace = this.txtNameSpace.Text;
+            cfg.Password = this.txtPassword.Text;
+            cfg.Prefix = this.txtPrefix.Text;
+            cfg.ServerAddress = this.txtServerAddress.Text;
+            SerializeHelper.Serialize<ConfigInfo>(cfg);
         }
 
         private string GetDBType(string type)
@@ -272,55 +340,6 @@ namespace EntityFac
                 default: return "";
             }
         }
-
-        private void CreateEntity(string tableName, DataTable dt)
-        {
-            string fileName = this.txtAddress.Text.Trim() + "\\Entity\\" + tableName + ".cs";
-            FileInfo file = new FileInfo(fileName);
-            if (!file.Directory.Exists)
-                file.Directory.Create();
-            using (StreamWriter sw = new StreamWriter(fileName))
-            {
-                sw.WriteLine("using System;");
-                sw.WriteLine("namespace " + this.txtNameSpace.Text + ".Entity");
-                sw.WriteLine("{");
-                sw.WriteLine("\tpublic partial class " + tableName);
-                sw.WriteLine("\t{");
-                foreach (DataRow dr in dt.Rows)
-                {
-                    sw.WriteLine("\t\t/// <summary>");
-                    sw.WriteLine("\t\t/// " + dr["Comment"].ToString());
-                    sw.WriteLine("\t\t/// <summary>");
-                    sw.WriteLine("\t\tpublic " + GetDataType(dr["ColumnType"].ToString()) + " " + dr["ColumnName"].ToString().StartWithUpper() + " { get; set; }");
-                }
-                sw.WriteLine("\t}");
-                sw.WriteLine("}");
-            }
-        }
-
-
-        private void OpenFileDir(string filePath)
-        {
-            Process open = new Process();
-            open.StartInfo.FileName = "explorer";
-            open.StartInfo.Arguments = @"/select," + filePath;
-            open.Start();
-        }
-
-        private void btnSelectPath_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                FolderBrowserDialog path = new FolderBrowserDialog();
-                path.ShowDialog();
-                this.txtAddress.Text = path.SelectedPath;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
         private string GetDataType(string DBTypeValue)
         {
             string result = "";
@@ -352,33 +371,6 @@ namespace EntityFac
             }
             return result;
         }
-
-
-        private void UpdateConfig(string key, string value)
-        {
-            Configuration cfa = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-
-            // cfa.AppSettings.Settings.Add("key", "Name");
-            cfa.AppSettings.Settings[key].Value = "value";
-            cfa.Save();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            ConfigInfo cfg = new ConfigInfo();
-            cfg.Account = this.txtAccount.Text;
-            cfg.ConnectionString = this.txtConnection.Text;
-            if (this.cbxDataBase.DataSource != null)
-                cfg.DataBase = this.cbxDataBase.SelectedValue.ToString();
-            cfg.FilePath = this.txtAddress.Text;
-            cfg.NameSpace = this.txtNameSpace.Text;
-            cfg.Password = this.txtPassword.Text;
-            cfg.Prefix = this.txtPrefix.Text;
-            cfg.ServerAddress = this.txtServerAddress.Text;
-            SerializeHelper.Serialize<ConfigInfo>(cfg);
-        }
-
-
 
     }
 }
