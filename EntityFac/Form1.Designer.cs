@@ -53,8 +53,7 @@
             this.btnSelectAll = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.cbxTables = new System.Windows.Forms.CheckedListBox();
-            this.cbxSaveConnect = new System.Windows.Forms.CheckBox();
-            this.cbxSaveFile = new System.Windows.Forms.CheckBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -114,7 +113,6 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.cbxSaveConnect);
             this.groupBox1.Controls.Add(this.btnQueryTable);
             this.groupBox1.Controls.Add(this.cbxDataBase);
             this.groupBox1.Controls.Add(this.label6);
@@ -213,7 +211,7 @@
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.cbxSaveFile);
+            this.groupBox2.Controls.Add(this.button1);
             this.groupBox2.Controls.Add(this.txtPrefix);
             this.groupBox2.Controls.Add(this.label8);
             this.groupBox2.Controls.Add(this.txtNameSpace);
@@ -303,27 +301,15 @@
             this.cbxTables.Size = new System.Drawing.Size(1189, 374);
             this.cbxTables.TabIndex = 0;
             // 
-            // cbxSaveConnect
+            // button1
             // 
-            this.cbxSaveConnect.AutoSize = true;
-            this.cbxSaveConnect.Location = new System.Drawing.Point(334, 61);
-            this.cbxSaveConnect.Name = "cbxSaveConnect";
-            this.cbxSaveConnect.Size = new System.Drawing.Size(96, 16);
-            this.cbxSaveConnect.TabIndex = 12;
-            this.cbxSaveConnect.Text = "保存连接配置";
-            this.cbxSaveConnect.UseVisualStyleBackColor = true;
-            this.cbxSaveConnect.CheckedChanged += new System.EventHandler(this.cbxSaveConnect_CheckedChanged);
-            // 
-            // cbxSaveFile
-            // 
-            this.cbxSaveFile.AutoSize = true;
-            this.cbxSaveFile.Location = new System.Drawing.Point(19, 85);
-            this.cbxSaveFile.Name = "cbxSaveFile";
-            this.cbxSaveFile.Size = new System.Drawing.Size(96, 16);
-            this.cbxSaveFile.TabIndex = 16;
-            this.cbxSaveFile.Text = "保存文件配置";
-            this.cbxSaveFile.UseVisualStyleBackColor = true;
-            this.cbxSaveFile.CheckedChanged += new System.EventHandler(this.cbxSaveFile_CheckedChanged);
+            this.button1.Location = new System.Drawing.Point(19, 66);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 16;
+            this.button1.Text = "保存配置";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // Form1
             // 
@@ -371,8 +357,7 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox txtNameSpace;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.CheckBox cbxSaveConnect;
-        private System.Windows.Forms.CheckBox cbxSaveFile;
+        private System.Windows.Forms.Button button1;
     }
 }
 

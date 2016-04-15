@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ConfigInfo>
+  <ServerAddress>SZC062\SQLEXPRESS</ServerAddress>
+  <Account>sa</Account>
+  <Password>123456</Password>
+  <NameSpace>Temp</NameSpace>
+  <Prefix>dt_</Prefix>
+  <FilePath>SZC062\SQLEXPRESS</FilePath>
+  <ConnectionString>Data Source=SZC062\SQLEXPRESS;User Id=sa;Password=123456;Initial Catalog=Mblog;</ConnectionString>
+</ConfigInfo>

@@ -42,18 +42,30 @@ namespace EntityFac
         public Form1()
         {
             InitializeComponent();
-            ConfigurationManager.RefreshSection("appSettings");
-            string connection = string.Format("Data Source={0};User Id={1};Password={2};"
-                , ConfigurationManager.AppSettings["serverAddress"]
-                , ConfigurationManager.AppSettings["account"]
-                , ConfigurationManager.AppSettings["pwd"]);
-            if (ConfigurationManager.AppSettings["database"] != "")
-                connection += string.Format("Initial Catalog={0};", ConfigurationManager.AppSettings["database"]);
-            this.txtConnection.Text = connection;
-            this.txtServerAddress.Text = ConfigurationManager.AppSettings["serverAddress"];
-            this.txtAccount.Text = ConfigurationManager.AppSettings["account"];
-            this.txtPassword.Text = ConfigurationManager.AppSettings["pwd"];
-            this.txtConnection.Text = ConfigurationManager.AppSettings["connectionStr"];
+            var cfg = SerializeHelper.Deserialize<ConfigInfo>();
+            if (cfg != null)
+            {
+                if (cfg.ConnectionString != "")
+                    this.txtConnection.Text = ConfigurationManager.AppSettings["connectionStr"];
+                else
+                {
+                    string connection = string.Format("Data Source={0};User Id={1};Password={2};"
+                           , cfg.ServerAddress
+                           , cfg.Account
+                           , cfg.Password);
+                    if (cfg.DataBase != "")
+                        connection += string.Format("Initial Catalog={0};", cfg.DataBase);
+                    this.txtConnection.Text = connection;
+                }
+                this.txtServerAddress.Text = cfg.ServerAddress;
+                this.txtAccount.Text = cfg.Account;
+                this.txtPassword.Text = cfg.Password;
+
+
+                this.txtNameSpace.Text = cfg.NameSpace;
+                this.txtPrefix.Text = cfg.Prefix;
+                this.txtAddress.Text = cfg.ServerAddress;
+            }
         }
 
         /// <summary>
@@ -187,6 +199,7 @@ namespace EntityFac
                     if (i == 0) file0 = this.txtAddress.Text.Trim() + "\\Entity\\" + tableName + ".cs";
 
                     CreateEntity(tableName, dt);
+                    CreateDal(tableName, dt);
                 }
                 OpenFileDir(file0);
                 MessageBox.Show("文件生成成功");
@@ -198,31 +211,69 @@ namespace EntityFac
 
         }
 
-        private void CreateEntity(string tableName, DataTable dt)
+        private void CreateDal(string tableName, DataTable dt)
         {
-            string fileName = this.txtAddress.Text.Trim() + "\\Dal\\" + tableName + ".cs";
+            string fileName = this.txtAddress.Text.Trim() + "\\Dal\\" + tableName + "Dal.cs";
             FileInfo file = new FileInfo(fileName);
             if (!file.Directory.Exists)
                 file.Directory.Create();
             using (StreamWriter sw = new StreamWriter(fileName))
             {
                 sw.WriteLine("using System;");
-                sw.WriteLine("namespace " + this.txtNameSpace.Text);
+                sw.WriteLine("using " + this.txtNameSpace.Text + ".Entity");
+                sw.WriteLine("namespace " + this.txtNameSpace.Text + ".Dal");
                 sw.WriteLine("{");
                 sw.WriteLine("\tpublic partial class " + tableName + "Dal");
                 sw.WriteLine("\t{");
-
+                sw.WriteLine("\t\tpublic void Insert(" + tableName + "Dal model)");
+                sw.WriteLine("\t\t{");
+                StringBuilder sbSql = new StringBuilder();
                 foreach (DataRow dr in dt.Rows)
                 {
-                    /*后续写Dal层*/
+                    var columnName = dr["ColumnName"].ToString().StartWithUpper();
+                    sbSql.AppendLine(string.Format(",[{0}]=@{0}", columnName));
+                    sw.WriteLine("\t\t\tnew SqlParameter(\"@" + columnName + "\",SqlDbType." + GetDBType(dr["ColumnType"].ToString()) + ","
+                        + dr["MaxLength"].ToString() + ") { Value=model." + columnName + " };");
                 }
+                sw.WriteLine("\t\t string sql=\n@\"" + sbSql.ToString() + "\";");
+                sw.WriteLine("\t\t}");
                 sw.WriteLine("\t}");
                 sw.WriteLine("}");
+
             }
         }
 
+        private string GetDBType(string type)
+        {
+            switch (type.ToLower())
+            {
+                case "binary": return "Binary";
+                case "varbinary": return "VarBinary";
+                case "image": return "Image";
+                case "varchar": return "VarChar";
+                case "nvarchar": return "NVarChar";
+                case "text": return "Text";
+                case "ntext": return "NText";
+                case "char": return "Char";
+                case "int": return "Int";
+                case "nchar": return "NChar";
+                case "bigint": return "BigInt";
+                case "real": return "Real";
+                case "float": return "Float";
+                case "bit": return "Bit";
+                case "tinyint": return "TinyInt";
+                case "smallint": return "SmallInt";
+                case "date": return "Date";
+                case "timestamp": return "TimeStamp";
+                case "datetime": return "DateTime";
+                case "money": return "Money";
+                case "smallmoney": return "SmallMoney";
+                case "numeric": return "Numeric";
+                default: return "";
+            }
+        }
 
-        private void CreateDal(string tableName, DataTable dt)
+        private void CreateEntity(string tableName, DataTable dt)
         {
             string fileName = this.txtAddress.Text.Trim() + "\\Entity\\" + tableName + ".cs";
             FileInfo file = new FileInfo(fileName);
@@ -231,7 +282,7 @@ namespace EntityFac
             using (StreamWriter sw = new StreamWriter(fileName))
             {
                 sw.WriteLine("using System;");
-                sw.WriteLine("namespace " + this.txtNameSpace.Text);
+                sw.WriteLine("namespace " + this.txtNameSpace.Text + ".Entity");
                 sw.WriteLine("{");
                 sw.WriteLine("\tpublic partial class " + tableName);
                 sw.WriteLine("\t{");
@@ -273,7 +324,7 @@ namespace EntityFac
         private string GetDataType(string DBTypeValue)
         {
             string result = "";
-            switch (DBTypeValue)
+            switch (DBTypeValue.ToLower())
             {
                 case "binary":
                 case "varbinary":
@@ -302,39 +353,6 @@ namespace EntityFac
             return result;
         }
 
-        private void cbxSaveConnect_CheckedChanged(object sender, EventArgs e)
-        {
-            if (this.cbxSaveConnect.Checked)
-            {
-                UpdateConfig("serverAddress", this.txtServerAddress.Text);
-                ConfigurationManager.AppSettings["account"] = this.txtAccount.Text;
-                ConfigurationManager.AppSettings["pwd"] = this.txtPassword.Text;
-                ConfigurationManager.AppSettings["connectionStr"] = this.txtConnection.Text;
-            }
-            else
-            {
-                UpdateConfig("serverAddress", "");
-                UpdateConfig("account", "");
-                UpdateConfig("pwd", "");
-                UpdateConfig("connectionStr", "");
-            }
-        }
-
-        private void cbxSaveFile_CheckedChanged(object sender, EventArgs e)
-        {
-            if (this.cbxSaveFile.Checked)
-            {
-                UpdateConfig("namespace", this.txtNameSpace.Text);
-                UpdateConfig("prefix", this.txtPrefix.Text);
-                UpdateConfig("filepath", this.txtAddress.Text);
-            }
-            else
-            {
-                UpdateConfig("namespace", "");
-                UpdateConfig("prefix", "");
-                UpdateConfig("filepath", "");
-            }
-        }
 
         private void UpdateConfig(string key, string value)
         {
@@ -343,6 +361,21 @@ namespace EntityFac
             // cfa.AppSettings.Settings.Add("key", "Name");
             cfa.AppSettings.Settings[key].Value = "value";
             cfa.Save();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            ConfigInfo cfg = new ConfigInfo();
+            cfg.Account = this.txtAccount.Text;
+            cfg.ConnectionString = this.txtConnection.Text;
+            if (this.cbxDataBase.DataSource != null)
+                cfg.DataBase = this.cbxDataBase.SelectedValue.ToString();
+            cfg.FilePath = this.txtAddress.Text;
+            cfg.NameSpace = this.txtNameSpace.Text;
+            cfg.Password = this.txtPassword.Text;
+            cfg.Prefix = this.txtPrefix.Text;
+            cfg.ServerAddress = this.txtServerAddress.Text;
+            SerializeHelper.Serialize<ConfigInfo>(cfg);
         }
 
 
