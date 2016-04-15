@@ -183,7 +183,7 @@ namespace EntityFac
                     {
                         tableName = dv["name"].ToString().Substring(this.txtPrefix.Text.Length);
                     }
-                    tableName = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(tableName);
+                    tableName = tableName.StartWithUpper();
                     string fileName = this.txtAddress.Text.Trim() + "\\" + tableName + ".cs";
                     FileInfo file = new FileInfo(fileName);
                     if (!file.Directory.Exists)
@@ -200,7 +200,7 @@ namespace EntityFac
                             sw.WriteLine("\t\t/// <summary>");
                             sw.WriteLine("\t\t/// " + dr["Comment"].ToString());
                             sw.WriteLine("\t\t/// <summary>");
-                            sw.WriteLine("\t\tpublic " + GetDataType(dr["ColumnType"].ToString()) + " " + System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(dr["ColumnName"].ToString()) + " { get; set; }");
+                            sw.WriteLine("\t\tpublic " + GetDataType(dr["ColumnType"].ToString()) + " " + dr["ColumnName"].ToString().StartWithUpper() + " { get; set; }");
                         }
                         sw.WriteLine("\t}");
                         sw.WriteLine("}");
@@ -313,6 +313,8 @@ namespace EntityFac
             cfa.AppSettings.Settings[key].Value = "value";
             cfa.Save();
         }
+
+
 
     }
 }
